@@ -106,4 +106,15 @@ nav a:hover::before {
     transform-origin: left top;
     transform: scale(1, 1);
 }
+
+nav a.selected::before {
+    background-color: #ec008c;
+    transform-origin: left top;
+    transform: scale(1, 1);
+    transition: none;
+}
+
+nav a.selected {
+    color: #00aeef;
+}
 /* #endregion */
