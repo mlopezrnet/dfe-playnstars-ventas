@@ -132,7 +132,7 @@ function displayScreenings() {
                     <span class="rating">${movie.ageRating}</span><span class="genre">${movie.genre}</span>
                     <br><span class="length">${movie.length}</span>
                     </td>
-                    <td>${movie.summary}</td>
+                    <td class="summary">${movie.summary}</td>
                     <td>
                         <p>${screening[1].showtimes.date}</p>
                         <p class="room">${screening[1].showtimes.room}</p>
