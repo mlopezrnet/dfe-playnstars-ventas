@@ -43,13 +43,18 @@ class Showtimes {
 //#endregion
 
 
-//#region DATOS
+//#region DATOS GLOBALES
+
+// Delay para simular carga desde servidor
+let delay = 2000;
 
 // Maps donde se almacenarán los objetos
 const franchisesMap = new Map();
 const moviesMap = new Map();
 const screeningsMap = new Map();
+let filteredScreenings = [];
 
+function populateData() {
 // Crea y setea los objetos en los maps
 franchisesMap.set(1, new Franchise(1, "Cinépolis Luis Encinas", "Blvd. Luis Encinas J. 227-P. B, San Benito, 83190 Hermosillo, Son."));
 franchisesMap.set(2, new Franchise(2, "Cinemex Luis Encinas", "Blvd. Jesús García Morales 2, Montebello, 83210 Hermosillo, Son."));
@@ -62,8 +67,9 @@ moviesMap.set(4, new Movie(4, "blackadam.webp", "Black Adam", "Drama/Acción", "
 
 screeningsMap.set(1, new Screening(1, 1, new Showtimes("2023-10-12", "Sala 11", "11:55 13:50 14:25 16:15 16:50 18:00 19:20 20:25 21:50"), "Entradas 2x1", 74, 37));
 screeningsMap.set(2, new Screening(1, 2, new Showtimes("2023-10-12", "Sala 4 VIP", "11:55 13:50 14:25 16:15 16:50 18:00 19:20 20:25 21:50"), "Entrada VIP a precio de sala normal", 175, 74));
-screeningsMap.set(3, new Screening(3, 3, new Showtimes("2023-10-12", "Sala 9", "11:55 13:50 14:25 16:15 16:50 18:00 19:20 20:25 21:50"), "Mercancía exclusiva", "Desde $99", null));
+screeningsMap.set(3, new Screening(3, 3, new Showtimes("2023-10-12", "Sala 9", "11:55 13:50 14:25 16:15 16:50 18:00 19:20 20:25 21:50"), "Mercancía exclusiva", "Desde $99", 99));
 screeningsMap.set(4, new Screening(2, 4, new Showtimes("2023-10-12", "Sala 6 VIP", "16:15 16:50 18:00 19:20"), "¡Tómate una foto con Dwayne Johnson en persona!", 999, 500));
+}
 
 //#endregion
 
@@ -84,7 +90,9 @@ function displayScreenings() {
 
         const imgPath = `../img/cartelera/`;
 
-        if (screeningsMap.size === 0) {
+        applyFilters();
+
+        if (filteredScreenings.length === 0) {
             showNotFoundMessage();
         } else {
             hideMessage();
@@ -92,10 +100,10 @@ function displayScreenings() {
             // Iteramos por funciones y tomamos nota de su sucursal
             let currentFranchise = null;
 
-            screeningsMap.forEach((screening) => {
+            filteredScreenings.forEach((screening) => {
 
-                const franchise = franchisesMap.get(screening.franchiseId);
-                const movie = moviesMap.get(screening.movieId);
+                const franchise = franchisesMap.get(screening[1].franchiseId);
+                const movie = moviesMap.get(screening[1].movieId);
 
                 if (currentFranchise !== franchise) {
 
@@ -126,25 +134,25 @@ function displayScreenings() {
                     </td>
                     <td>${movie.summary}</td>
                     <td>
-                        <p>${screening.showtimes.date}</p>
-                        <p class="room">${screening.showtimes.room}</p>
-                        <p>${screening.showtimes.showtimes}</p>
+                        <p>${screening[1].showtimes.date}</p>
+                        <p class="room">${screening[1].showtimes.room}</p>
+                        <p>${screening[1].showtimes.showtimes}</p>
                     </td>
-                    <td>${screening.promoDescription}</td>
+                    <td>${screening[1].promoDescription}</td>
                 `;
 
                 // Mostrar precio de promocion si es menor al precio normal
-                if (screening.promoPrice && screening.promoPrice < screening.retailPrice) {
+                if (screening[1].promoPrice && screening[1].promoPrice < screening[1].retailPrice) {
                     commonHTML += `
                     <td>
-                        <del style="color: gray;">${formatCurrency(screening.retailPrice)}</del><br>
-                        <span style="color: #ec008c;">${formatCurrency(screening.promoPrice)}</span>
+                        <del style="color: gray;">${formatCurrency(screening[1].retailPrice)}</del><br>
+                        <span style="color: #ec008c;">${formatCurrency(screening[1].promoPrice)}</span>
                     </td>
                 `;
                 } else {
                     // Mostrar precio normal
                     commonHTML += `
-                    <td>${formatCurrency(screening.retailPrice)}</td>
+                    <td>${formatCurrency(screening[1].retailPrice)}</td>
                 `;
                 }
                 row.innerHTML = commonHTML;
@@ -152,7 +160,7 @@ function displayScreenings() {
                 tablaBody.appendChild(row);
             });
         }
-    }, 2000);
+    }, delay);
 }
 
 //#endregion
@@ -201,11 +209,79 @@ function hideMessage() {
 
 //#endregion
 
+//#region FILTROS (VIEW)
+
+function initForms() {
+    initButtonsHandler();
+
+    const franchiseSelect = document.getElementById('franchise');
+    franchisesMap.forEach(franchise => {
+        const option = document.createElement('option');
+        option.value = franchise.id;
+        option.text = franchise.name;
+        franchiseSelect.appendChild(option);
+    });
+}
+
+// Funcion que inicializa los eventos de los botones del filto
+function initButtonsHandler() {
+
+    document.getElementById('filter-form').addEventListener('submit', event => {
+        event.preventDefault();
+        delay = 0;
+        displayScreenings();
+    });
+
+    document.getElementById('reset-filters').addEventListener('click', () => {
+        document.querySelectorAll('input.filter-field').forEach(input => input.value = '');
+        delay = 2000;
+        displayScreenings();
+    });
+
+}
+
+
+// Gestiona los filtros del usuario y manda a llamar a la función que los aplica
+function applyFilters() {
+    const text = document.getElementById('text').value.toLowerCase();
+    const ageRating = document.getElementById('ageRating').value.toLowerCase();
+    const genre = document.getElementById('genre').value.toLowerCase();
+    const promo = document.getElementById('promo').value.toLowerCase();
+    // Si parseFloat regresa un Nan, extraer la parte numérica
+    const maxPrice = parseFloat(document.getElementById('price-max').value) || parseFloat(document.getElementById('price-max').value.match(/\d+/));
+    const franchise = document.getElementById('franchise').value;
+
+    filteredScreenings = filterScreenings(text, ageRating, genre, promo, maxPrice, franchise);
+}
+
+
+// Funcion que filtra y regresa las funciones segun los filtros usados
+function filterScreenings(text, ageRating, genre, promo, maxPrice, franchise) {
+    return Array.from(screeningsMap).filter(screening => {
+        const movie = moviesMap.get(screening[1].movieId);
+        const _franchise = franchisesMap.get(screening[1].franchiseId);
+
+        // Condiciones que tiene que pasar para que se considere una coincidencia
+        const textMatch = movie.name.toLowerCase().includes(text) || movie.summary.toLowerCase().includes(text);
+        const ageRatingMatch = movie.ageRating.toLowerCase().includes(ageRating);
+        const genreMatch = movie.genre.toLowerCase().includes(genre);
+        const promoMatch = screening[1].promoDescription.toLowerCase().includes(promo);
+        const priceMatch = !maxPrice || screening[1].promoPrice <= maxPrice;
+        let franchiseMatch = true;  // Siempre filtrar por todas las franquicias a menos que se especifique una
+        if (franchise && franchise > -1) {
+            franchiseMatch = screening[1].franchiseId == franchise;
+        }
+
+        return textMatch && ageRatingMatch && genreMatch && promoMatch && priceMatch && franchiseMatch;
+    });
+}
+
+//#endregion
 
 //#region CONTROLADOR
 
+populateData();
 displayScreenings();
-
-//initButtonsHandler();
+initForms();
 
 //#endregion
