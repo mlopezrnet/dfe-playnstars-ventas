@@ -1,18 +1,44 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
 
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <link rel="icon" type="image/x-icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🌟</text></svg>">
-  <link rel="stylesheet" type="text/css" href="./css/style.css">
-  <script src="./js/common.js" defer></script>
-  <script src="./js/main.js" defer></script>
-  <title>Play&amp;Stars - Salas</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="icon" type="image/x-icon"
+        href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🌟</text></svg>">
+    <link rel="stylesheet" type="text/css" href="./css/style.css">
+    <script src="./js/common.js" defer></script>
+    <script src="./js/main.js" defer></script>
+    <title>Play&amp;Stars - Salas</title>
 
 </head>
+
 <body>
 
     <header id="navbar"></header>
+    <main>
+        <h1><span>⭐</span>Salas Premium<span>⭐</span></h1>
 
+        <!-- Tabla con id=salas-table, Cada Sala ofertada debe tener como mínimo: imagen de la película emitida, nombre
+de la película, franquicia de cine, lugar y fecha de emisión, descripción de la promoción especial y precio. !-->
+        <div id="table-container">
+            <table id="salas-table">
+                <thead>
+                    <tr>
+                        <th colspan="2">Película</th>
+                        <th>Sinopsis</th>
+                        <th>Funciones</th>
+                        <th colspan="2">Promo exclusiva</th>
+                    </tr>
+                </thead>
+                <tbody id="salas-table-body">
+                    <!-- Aquí se generará la tabla dinámicamente -->
+                </tbody>
+            </table>
+        </div>
+        <div id="message">
+            <p>No hay funciones disponibles en este momento.</p>
+        </div>
+    </main>
 </body>

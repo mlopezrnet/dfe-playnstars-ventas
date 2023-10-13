@@ -12,8 +12,7 @@ body {
     font-family: "Source Sans 3", sans-serif;
     font-size: 16px;
     font-weight: 400;
-    background-color: #f5f7fa;
-    color: #00aeef;
+    color: #15252b;
 }
 
 /* #region ENCABEZADO */
@@ -117,4 +116,128 @@ nav a.selected::before {
 nav a.selected {
     color: #00aeef;
 }
+
+/* #endregion */
+
+/* #region CONTENIDO */
+main {
+    background-color: #f5f7fa;
+    padding: 100px 50px 20px 50px;
+}
+
+main h1 {
+    font-family: "Courgette", cursive;
+    font-size: 2.75rem;
+    text-align: center;
+    display: block;
+    margin-inline: auto;
+    width: max-content;
+    margin-bottom: 1rem;
+    background-image: linear-gradient(45deg, #FEDB37 2%, #D1B464 25%, #FEDB37 40%, #D1B464 60%, #FEDB37 95%);
+    background-clip: text;
+    -webkit-background-clip: text;
+    -moz-background-clip: text;
+    text-fill-color: transparent;
+    -webkit-text-fill-color: transparent;
+    -moz-text-fill-color: transparent;
+    user-select: none;
+}
+
+main h1 span {
+    font-size: 1.25rem;
+    display: inline-block;
+    margin-inline: 0.5rem;
+    vertical-align: 0.5rem;
+}
+
+/* Estilos para la tabla */
+table {
+    border-collapse: collapse;
+    width: 100%;
+    border-spacing: 0;
+}
+
+tbody {
+    border: 2px solid #d1d1d1;
+}
+
+td {
+    text-align: center;
+    padding: 0.5rem;
+}
+
+td h3:not(.franchise-leading-row h3) {
+    padding-block: 0.5rem;
+}
+
+.franchise-leading-row td {
+    background-color: #f3bb54;
+    border: 3px solid #e4a839;
+    text-align: left;
+    z-index: 1;
+}
+
+th {
+    background-color: #4CAF50;
+    border: 3px solid #4CAF50;
+    color: white;
+    padding: 16px;
+    z-index: 0;
+}
+
+.rating {
+    display: inline-block;
+    background-color: #d3d3d3;
+    border-radius: 3px;
+    margin-left: 5px;
+    padding-inline: 3px;
+    font-size: 12px;
+}
+
+.genre {
+    display: inline-block;
+    padding-inline: 6px;
+    font-size: 12px;
+    font-weight: 100;
+}
+
+.length {
+    margin-top: 6px;
+    font-size: 12px;
+    font-weight: 100;
+    color: gray;
+}
+
+.star-rating {
+    color: gold;
+    font-size: 1.5rem;
+}
+
+.room {
+    color:#aa7b23
+}
+
+/* Estilos para los botones */
+.btn {
+    display: inline-block;
+    border-radius: 4px;
+    background-color: #00aeef;
+    border: none;
+    color: #FFFFFF;
+    text-align: center;
+    font-size: 1rem;
+    padding: 8px;
+    width: 100px;
+    transition: all 0.5s;
+    cursor: pointer;
+    margin: 5px;
+    margin-inline: auto;
+}
+
+.btn:hover {
+    background-color: #ec008c;
+}
+
+
+
 /* #endregion */
