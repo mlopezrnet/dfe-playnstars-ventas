@@ -1,3 +1,5 @@
+import { fetchAPI } from './fetch-api.js';
+
 //#region MODELO
 
 class Franchise {
@@ -54,21 +56,20 @@ const moviesMap = new Map();
 const screeningsMap = new Map();
 let filteredScreenings = [];
 
-function populateData() {
-// Crea y setea los objetos en los maps
-franchisesMap.set(1, new Franchise(1, "Cinépolis Luis Encinas", "Blvd. Luis Encinas J. 227-P. B, San Benito, 83190 Hermosillo, Son."));
-franchisesMap.set(2, new Franchise(2, "Cinemex Luis Encinas", "Blvd. Jesús García Morales 2, Montebello, 83210 Hermosillo, Son."));
-franchisesMap.set(3, new Franchise(3, "Cinépolis Galerías Mall", "Av Cultura 55, Proyecto Rio Sonora Hermosillo XXI, 83270 Hermosillo, Son."));
+function populateMaps(data) {
+    data = data[0];  // los datos están anidados en un arreglo, por lo que se extrae el primer elemento
 
-moviesMap.set(1, new Movie(1, "gatoconbotas2.jpg", "El Gato con Botas: El último Deseo", "Aventura/Comedia", "1h 40m", "A", 7.8, "El Gato con Botas descubre que su pasión por la aventura le ha pasado factura cuando descubre que ha usado ocho de sus nueve vidas. El Gato emprende un viaje épico para encontrar el mítico Último Deseo y restaurar sus nueve vidas."));
-moviesMap.set(2, new Movie(2, "oppenheimer.jpg", "Oppenheimer", "Drama/Thriller", "3h", "B-15", 7.2, "En tiempos de guerra, el brillante físico estadounidense Julius Robert Oppenheimer (Cillian Murphy), al frente del \"Proyecto Manhattan\", lidera los ensayos nucleares para construir la bomba atómica para su país. Impactado por su poder destructivo, Oppenheimer se cuestiona las consecuencias morales de su creación. Desde entonces y el resto de su vida, se opondría firmemente al uso de armas nucleares."));
-moviesMap.set(3, new Movie(3, "barbie.webp", "Barbie", "Comedia/Fantasía", "1h 54m", "B", 7.1, "Barbie (Margot Robbie) lleva una vida ideal en Barbieland, allí todo es perfecto, con chupi fiestas llenas de música y color, y todos los días son el mejor día. Claro que Barbie se hace algunas preguntas, cuestiones bastante incómodas que no encajan con el mundo idílico en el que ella y las demás Barbies viven. Cuando Barbie se dé cuenta de que es capaz de apoyar los talones en el suelo, y tener los pies planos, decidirá calzarse unos zapatos sin tacones y viajar hasta el mundo real."));
-moviesMap.set(4, new Movie(4, "blackadam.webp", "Black Adam", "Drama/Acción", "2h 5m", "B", 6.3, "Casi 5.000 años después de haber sido dotado de los poderes omnipotentes de los antiguos dioses, Black Adam (Johnson) es liberado de su tumba terrenal, listo para desatar su forma única de justicia en el mundo moderno..."));
+    data.franchises.forEach(franchise => {
+        franchisesMap.set(franchise.id, new Franchise(franchise.id, franchise.name, franchise.address));
+    });
 
-screeningsMap.set(1, new Screening(1, 1, new Showtimes("2023-10-12", "Sala 11", "11:55 13:50 14:25 16:15 16:50 18:00 19:20 20:25 21:50"), "Entradas 2x1", 74, 37));
-screeningsMap.set(2, new Screening(1, 2, new Showtimes("2023-10-12", "Sala 4 VIP", "11:55 13:50 14:25 16:15 16:50 18:00 19:20 20:25 21:50"), "Entrada VIP a precio de sala normal", 175, 74));
-screeningsMap.set(3, new Screening(3, 3, new Showtimes("2023-10-12", "Sala 9", "11:55 13:50 14:25 16:15 16:50 18:00 19:20 20:25 21:50"), "Mercancía exclusiva", "Desde $99", 99));
-screeningsMap.set(4, new Screening(2, 4, new Showtimes("2023-10-12", "Sala 6 VIP", "16:15 16:50 18:00 19:20"), "¡Tómate una foto con Dwayne Johnson en persona!", 999, 500));
+    data.movies.forEach(movie => {
+        moviesMap.set(movie.id, new Movie(movie.id, movie.img, movie.name, movie.genre, movie.length, movie.ageRating, movie.avgRating, movie.summary));
+    });
+
+    data.screenings.forEach(screening => {
+        screeningsMap.set(screening.id, new Screening(screening.franchiseId, screening.movieId, new Showtimes(screening.showtimes.date, screening.showtimes.room, screening.showtimes.showtimes), screening.promoDescription, screening.retailPrice, screening.promoPrice));
+    });
 }
 
 //#endregion
@@ -102,8 +103,8 @@ function displayScreenings() {
 
             filteredScreenings.forEach((screening) => {
 
-                const franchise = franchisesMap.get(screening[1].franchiseId);
-                const movie = moviesMap.get(screening[1].movieId);
+                const franchise = franchisesMap.get(screening.franchiseId);
+                const movie = moviesMap.get(screening.movieId);
 
                 if (currentFranchise !== franchise) {
 
@@ -134,25 +135,25 @@ function displayScreenings() {
                     </td>
                     <td class="summary">${movie.summary}</td>
                     <td>
-                        <p>${screening[1].showtimes.date}</p>
-                        <p class="room">${screening[1].showtimes.room}</p>
-                        <p>${screening[1].showtimes.showtimes}</p>
+                        <p>${screening.showtimes.date}</p>
+                        <p class="room">${screening.showtimes.room}</p>
+                        <p>${screening.showtimes.showtimes}</p>
                     </td>
-                    <td>${screening[1].promoDescription}</td>
+                    <td>${screening.promoDescription}</td>
                 `;
 
                 // Mostrar precio de promocion si es menor al precio normal
-                if (screening[1].promoPrice && screening[1].promoPrice < screening[1].retailPrice) {
+                if (screening.promoPrice && screening.promoPrice < screening.retailPrice) {
                     commonHTML += `
                     <td>
-                        <del style="color: gray;">${formatCurrency(screening[1].retailPrice)}</del><br>
-                        <span style="color: #ec008c;">${formatCurrency(screening[1].promoPrice)}</span>
+                        <del style="color: gray;">${formatCurrency(screening.retailPrice)}</del><br>
+                        <span style="color: #ec008c;">${formatCurrency(screening.promoPrice)}</span>
                     </td>
                 `;
                 } else {
                     // Mostrar precio normal
                     commonHTML += `
-                    <td>${formatCurrency(screening[1].retailPrice)}</td>
+                    <td>${formatCurrency(screening.retailPrice)}</td>
                 `;
                 }
                 row.innerHTML = commonHTML;
@@ -257,19 +258,19 @@ function applyFilters() {
 
 // Funcion que filtra y regresa las funciones segun los filtros usados
 function filterScreenings(text, ageRating, genre, promo, maxPrice, franchise) {
-    return Array.from(screeningsMap).filter(screening => {
-        const movie = moviesMap.get(screening[1].movieId);
-        const _franchise = franchisesMap.get(screening[1].franchiseId);
+    return [...screeningsMap.values()].filter(screening => {
+        const movie = moviesMap.get(screening.movieId);
+        const _franchise = franchisesMap.get(screening.franchiseId);
 
         // Condiciones que tiene que pasar para que se considere una coincidencia
         const textMatch = movie.name.toLowerCase().includes(text) || movie.summary.toLowerCase().includes(text);
         const ageRatingMatch = movie.ageRating.toLowerCase().includes(ageRating);
         const genreMatch = movie.genre.toLowerCase().includes(genre);
-        const promoMatch = screening[1].promoDescription.toLowerCase().includes(promo);
-        const priceMatch = !maxPrice || screening[1].promoPrice <= maxPrice;
+        const promoMatch = screening.promoDescription.toLowerCase().includes(promo);
+        const priceMatch = !maxPrice || screening.promoPrice <= maxPrice;
         let franchiseMatch = true;  // Siempre filtrar por todas las franquicias a menos que se especifique una
         if (franchise && franchise > -1) {
-            franchiseMatch = screening[1].franchiseId == franchise;
+            franchiseMatch = screening.franchiseId == franchise;
         }
 
         return textMatch && ageRatingMatch && genreMatch && promoMatch && priceMatch && franchiseMatch;
@@ -278,9 +279,22 @@ function filterScreenings(text, ageRating, genre, promo, maxPrice, franchise) {
 
 //#endregion
 
+//#region CONSUMO DE DATOS DESDE API
+
+function getScreenings() {
+
+    fetchAPI('screenings', 'GET')
+        .then(data => {
+            populateMaps(data);
+        });
+
+}
+
+//#endregion
+
 //#region CONTROLADOR
 
-populateData();
+getScreenings();
 displayScreenings();
 initForms();
 
