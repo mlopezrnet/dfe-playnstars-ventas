@@ -1,76 +1,11 @@
-import { fetchAPI } from './fetch-api.js';
-
-//#region MODELO
-
-class Franchise {
-    constructor(id, name, address) {
-        this.id = id;
-        this.name = name;
-        this.address = address;
-    }
-}
-
-class Movie {
-    constructor(id, img, name, genre, length, ageRating, avgRating, summary) {
-        this.id = id;
-        this.img = img;
-        this.name = name;
-        this.genre = genre;
-        this.length = length;
-        this.ageRating = ageRating;
-        this.avgRating = avgRating;
-        this.summary = summary;
-    }
-}
-
-class Screening {
-    constructor(franchiseId, movieId, showtimes, promoDescription, retailPrice, promoPrice) {
-        this.franchiseId = franchiseId;
-        this.movieId = movieId;
-        this.showtimes = showtimes;
-        this.promoDescription = promoDescription;
-        this.retailPrice = retailPrice;
-        this.promoPrice = promoPrice;
-    }
-}
-
-class Showtimes {
-    constructor(date, room, showtimes) {
-        this.date = date; // string
-        this.room = room;
-        this.showtimes = showtimes;
-    }
-}
-
-//#endregion
-
+import { franchisesMap, moviesMap, screeningsMap, getScreenings, formatCurrency } from './common.js';
 
 //#region DATOS GLOBALES
 
 // Delay para simular carga desde servidor
 let delay = 2000;
 
-// Maps donde se almacenarán los objetos
-const franchisesMap = new Map();
-const moviesMap = new Map();
-const screeningsMap = new Map();
 let filteredScreenings = [];
-
-function populateMaps(data) {
-    data = data[0];  // los datos están anidados en un arreglo, por lo que se extrae el primer elemento
-
-    data.franchises.forEach(franchise => {
-        franchisesMap.set(franchise.id, new Franchise(franchise.id, franchise.name, franchise.address));
-    });
-
-    data.movies.forEach(movie => {
-        moviesMap.set(movie.id, new Movie(movie.id, movie.img, movie.name, movie.genre, movie.length, movie.ageRating, movie.avgRating, movie.summary));
-    });
-
-    data.screenings.forEach(screening => {
-        screeningsMap.set(screening.id, new Screening(screening.franchiseId, screening.movieId, new Showtimes(screening.showtimes.date, screening.showtimes.room, screening.showtimes.showtimes), screening.promoDescription, screening.retailPrice, screening.promoPrice));
-    });
-}
 
 //#endregion
 
@@ -165,22 +100,6 @@ function displayScreenings() {
 }
 
 //#endregion
-
-// Formato de moneda
-const currencyFormatter = new Intl.NumberFormat('es-MX', {
-    style: 'currency',
-    currency: 'MXN',
-    minimumFractionDigits: 2
-});
-
-function formatCurrency(value) {
-    const formattedValue = currencyFormatter.format(value);
-    if (formattedValue !== '$NaN') {
-        return formattedValue;
-    } else {
-        return value;
-    }
-}
 
 // Funcion que limpia la tabla
 function clearTable() {
@@ -279,23 +198,12 @@ function filterScreenings(text, ageRating, genre, promo, maxPrice, franchise) {
 
 //#endregion
 
-//#region CONSUMO DE DATOS DESDE API
-
-function getScreenings() {
-
-    fetchAPI('screenings', 'GET')
-        .then(data => {
-            populateMaps(data);
-        });
-
-}
-
-//#endregion
-
 //#region CONTROLADOR
 
-getScreenings();
-displayScreenings();
-initForms();
+getScreenings().then(() => {
+    initForms();
+    displayScreenings();
+});
+
 
 //#endregion
