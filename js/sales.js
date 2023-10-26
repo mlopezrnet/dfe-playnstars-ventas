@@ -2,20 +2,18 @@ import { fetchAPI } from './fetch-api.js';
 import { franchisesMap, moviesMap, screeningsMap, getScreenings, formatCurrency } from './common.js';
 
 class Sale {
-    constructor(id, franchiseId, movieId, date, showtime, promoDescription, total) {
+    constructor(id, franchiseId, movieId, date, showtime, room, seats, promoDescription, total) {
         this.id = id;
         this.franchiseId = franchiseId;
         this.movieId = movieId;
         this.date = date;
         this.showtime = showtime;
+        this.room = room;
+        this.seats = seats;
         this.promoDescription = promoDescription;
         this.total = total;
     }
 }
-
-const modal = document.querySelector("dialog");
-const addSaleButton = document.getElementById('addSale');
-const closeButton = document.getElementById("close-modal");
 
 //#region DATOS GLOBALES
 
@@ -24,14 +22,6 @@ const sales = new Map();
 let delay = 2000;
 
 //#endregion
-
-addSaleButton.addEventListener("click", () => {
-    modal.showModal();
-});
-
-closeButton.addEventListener("click", () => {
-    modal.close();
-});
 
 // Función para obtener los boletos vendidos
 function getSales() {
@@ -44,7 +34,7 @@ function getSales() {
 
 function mapAPIToSales(data) {
     for (const sale of data) {
-        sales.set(sale.id, new Sale(sale.id, sale.franchiseId, sale.movieId, sale.date, sale.showtime, sale.promoDescription, sale.total));
+        sales.set(sale.id, new Sale(sale.id, sale.franchiseId, sale.movieId, sale.date, sale.showtime, sale.room, sale.seats, sale.promoDescription, sale.total));
     }
 }
 
@@ -71,12 +61,16 @@ function displaySalesTable() {
                 <td>${franchise.name}</td>
                 <td>${movie.name}</td>
                 <td>${sale.date}</td>
-                <td>${sale.showtime}</td>
+                <td>
+                    <p class="room">Sala ${sale.room}</p>
+                    <p>${sale.showtime}</p>
+                </td>
+                <td>${sale.seats}</td>
                 <td>${sale.promoDescription}</td>
                 <td>${formatCurrency(sale.total)}</td>
                 <td>
-                    <button class="btn btn-primary btn-sm" data-sale-id="${sale.id}" data-action="edit">Editar</button>
-                    <button class="btn btn-danger btn-sm" data-sale-id="${sale.id}" data-action="delete">Eliminar</button>
+                    <button class="btn-sm" data-sale-id="${sale.id}" data-action="edit"><i class="fas fa-edit"></i></button>
+                    <button class="btn-sm" data-sale-id="${sale.id}" data-action="delete"><i class="far fa-trash-alt"></i></button>
                 </td>
     
             `;
@@ -137,11 +131,57 @@ function deleteSale(saleId) {
         });
 }
 
+//#region FILTROS (VIEW)
+
+function initForms() {
+    initButtonsHandler();
+
+    /*
+        const franchiseSelect = document.getElementById('franchise');
+        franchisesMap.forEach(franchise => {
+            const option = document.createElement('option');
+            option.value = franchise.id;
+            option.text = franchise.name;
+            franchiseSelect.appendChild(option);
+        });
+    */
+}
+
+// Funcion que inicializa los eventos de los botones
+function initButtonsHandler() {
+    const modal = document.querySelector("dialog");
+    const addSaleButton = document.getElementById('addSale');
+    const closeButton = document.getElementById("close-modal");
+    
+    document.getElementById('filter-form').addEventListener('submit', event => {
+        event.preventDefault();
+        delay = 0;
+        //displayScreenings();
+    });
+
+    document.getElementById('reset-filters').addEventListener('click', () => {
+        document.querySelectorAll('input.filter-field').forEach(input => input.value = '');
+        delay = 2000;
+        //displayScreenings();
+    });
+
+    addSaleButton.addEventListener("click", () => {
+        modal.showModal();
+    });
+
+    closeButton.addEventListener("click", () => {
+        modal.close();
+    });
+}
+
+//#endregion
+
 // INICIALIZACIÓN
 function initSalesPage() {
     // Hacer promesas para obtener ambos screenings y sales
     Promise.all([getScreenings(), getSales()])
         .then(() => {
+            initForms();
             displaySalesTable();
         })
         .catch(error => {

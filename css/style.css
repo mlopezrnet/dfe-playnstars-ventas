@@ -1,5 +1,6 @@
 @import url('https://fonts.googleapis.com/css2?family=Source+Sans+3:wght@600&display=swap');
 @import url('https://fonts.googleapis.com/css2?family=Courgette&family=Source+Sans+3:wght@600&display=swap');
+@import url('https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css');
 
 * {
     box-sizing: border-box;
@@ -219,21 +220,22 @@ th {
 }
 
 /* Estilos para la sección de filtros */
-#filter-section {
-    background-color: white;
+#filter-section, .filter-section {
     padding: 0 1rem 1rem 1rem;
     border: none;
     display: flex;
     flex-wrap: wrap;
     gap: 0.5rem;
     align-items: center;
+    justify-content: space-evenly;
 }
 
 /* Estilos para los campos de filtro */
 input[type="text"],
-input[type="number"] {
+input[type="number"],
+input[type="date"] {
     flex-grow: 1;
-    min-width: 200px;
+    min-width: 150px;
     font-size: 16px;
     padding: 0.6rem;
     border: 1px solid #d1d1d1;
@@ -287,7 +289,123 @@ button#reset-filters:hover {
     background-color: #e2e9f1;
 }
 
+/* #region MODAL DE VENTAS */
 
+dialog {
+    background-color: #f5f7fa;
+    border: 2px solid #d1d1d1;
+    border-radius: 3px;
+    padding: 1rem;
+    width: 100%;
+    max-width: 500px;
+    margin: 0 auto;
+}
+
+dialog::backdrop {
+    background-color: rgba(0, 0, 0, 0.5);
+}
+
+dialog h2 {
+    font-size: 1.5rem;
+    margin-bottom: 1rem;
+}
+
+dialog#sale-modal {
+    position: fixed;
+    top: 50%;
+    transform: translateY(-50%);
+    max-width: 800px;
+}
+
+.btn-close {
+    position: absolute;
+    top: 0;
+    right: 0;
+    border: none;
+    background-color: transparent;
+    cursor: pointer;
+    padding: 1rem;
+}
+
+.form-field {
+    display: flex;
+    flex-direction: column;
+}
+
+.form-section {
+    display: flex;
+    flex-direction: column;
+    width: auto;
+    padding: 1rem;
+    gap: 0.5rem;
+}
+
+.sale-fields-container {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1rem;
+
+    & .form-field {
+        flex: 1;
+    }
+
+    & label {
+        margin-bottom: 0.5rem;
+    }
+
+}
+
+#sale-date-field {
+    width: 150px;
+    display: flex;
+    flex-direction: row;
+}
+
+.fa-trash-alt {
+    color: rgb(156, 17, 17);
+}
+
+.fa-edit {
+    color:rgb(21, 54, 116);
+}
+
+.btn-sm {
+    border: 1px solid #d1d1d1;
+    width: 42px;
+    padding: 0.6rem;
+    margin-right: 0.25rem;
+    margin-bottom: 0.1rem;
+}
+
+button[data-action="edit"]:hover {
+    background-color: lightblue;
+    border-color: rgb(86, 124, 180);
+}
+
+button[data-action="delete"]:hover {
+    background-color: rgb(211, 73, 73);
+    border-color: rgb(156, 17, 17);
+
+    & .fa-trash-alt {
+        color: white;
+    }
+}
+
+#addSale, .btn-submit {
+    background-color: #2f78b4;
+    color: #fff;
+    font-weight: 600;
+
+    &:hover {
+        background-color: #1c5f9b;
+    }
+}
+
+#save-sale {
+    margin-top: 1rem;
+}
+
+/* #endregion */
 
 
 /* #endregion */
@@ -312,6 +430,7 @@ button#reset-filters:hover {
     header {
         justify-content: center;
     }
+
     .summary {
         display: none;
     }
