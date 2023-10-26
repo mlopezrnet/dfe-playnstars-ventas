@@ -71,7 +71,7 @@ function displayScreenings() {
                     <td class="summary">${movie.summary}</td>
                     <td>
                         <p>${screening.showtimes.date}</p>
-                        <p class="room">${screening.showtimes.room}</p>
+                        <p class="room">Sala ${screening.showtimes.room}</p>
                         <p>${screening.showtimes.showtimes}</p>
                     </td>
                     <td>${screening.promoDescription}</td>

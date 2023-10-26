@@ -23,7 +23,7 @@
     <form id="filter-form" class="filter-section">
 
       <select id="franchise-filter" class="filter-field" placeholder="Sucursal">
-        <option value="" selected>Todas las sucursales</option>
+        <option value="-1" selected>Todas las sucursales</option>
         <!-- Llenaremos las opciones con datos consumidos desde una API -->
       </select>
 
@@ -53,9 +53,9 @@
             <th>Fecha</th>
             <th>Función</th>
             <th>Asientos</th>
-            <th>Promoción</th>
+            <th class="promoColumn">Promoción</th>
             <th>Pago</th>
-            <th></th>
+            <th class="actionColumn"></th>
           </tr>
         </thead>
         <tbody id="data-table-body">
@@ -69,10 +69,10 @@
 
     <dialog id="sale-modal" class="modal">
 
-      <h2>NUEVA VENTA DE BOLETOS</h2>
+      <h2 id="sale-modal-title">NUEVA VENTA DE BOLETOS</h2>
 
       <form id="sale-form" class="form-section">
-        <button id="close-modal" class="btn-close">✖</button>
+        <div id="close-modal" class="btn-close">✖</div>
 
         <label for="franchise-field">Sucursal:</label>
         <select id="franchise-field" class="form-field" required>
@@ -84,32 +84,40 @@
           <!-- Llenaremos las opciones con datos consumidos desde una API -->
         </select>
 
-        <label for="sale-date-field">Fecha:</label>
-        <input type="date" id="sale-date-field" class="form-field" required>
-
         <div class="sale-fields-container">
+          <div class="form-field">
+            <label for="sale-date-field">Fecha:</label>
+            <input type="date" id="sale-date-field" class="form-field" required>
+          </div>
           <div class="form-field">
             <label for="showtime-field">Función:</label>
             <select id="showtime-field" class="form-field" required>
               <!-- Llenaremos las opciones con datos consumidos desde una API -->
             </select>
           </div>
-
-          <div class="form-field">
-            <label for="showtime-seats">Asiento(s):</label>
-            <input type="text" id="showtime-seats" class="form-input">
-          </div>
         </div>
 
         <div class="sale-fields-container">
           <div class="form-field">
             <label for="sale-tickets-field">Entradas:</label>
-            <input type="number" id="sale-tickets-field" class="form-input" required>
+            <input type="number" id="sale-tickets-field" class="form-input" value="1" min="1" onKeyDown="return false" required>
+          </div>
+
+          <div class="form-field">
+            <label for="showtime-seats">Asiento(s):</label>
+            <input type="text" id="showtime-seats" class="form-input" placeholder="Separados por espacios (A10 A12)" required>
+          </div>
+        </div>
+
+        <div class="sale-fields-container">
+          <div class="form-field">
+            <label for="sale-promo-field">Promoción aplicada:</label>
+            <input type="text" id="sale-promo-field" class="form-field" placeholder="Ninguna" disabled>
           </div>
 
           <div class="form-field">
             <label for="sale-total-field">Total a Pagar:</label>
-            <input type="number" id="sale-total-field" class="form-input" required>
+            <input type="text" id="sale-total-field" class="form-input" required disabled>
           </div>
         </div>
 

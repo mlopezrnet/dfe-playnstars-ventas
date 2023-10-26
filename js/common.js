@@ -24,7 +24,8 @@ export class Movie {
 }
 
 export class Screening {
-    constructor(franchiseId, movieId, showtimes, promoDescription, retailPrice, promoPrice) {
+    constructor(id, franchiseId, movieId, showtimes, promoDescription, retailPrice, promoPrice) {
+        this.id = id;
         this.franchiseId = franchiseId;
         this.movieId = movieId;
         this.showtimes = showtimes;
@@ -62,7 +63,7 @@ export function populateMaps(data) {
     });
 
     data.screenings.forEach(screening => {
-        screeningsMap.set(screening.id, new Screening(screening.franchiseId, screening.movieId, new Showtimes(screening.showtimes.date, screening.showtimes.room, screening.showtimes.showtimes), screening.promoDescription, screening.retailPrice, screening.promoPrice));
+        screeningsMap.set(screening.id, new Screening(screening.id, screening.franchiseId, screening.movieId, new Showtimes(screening.showtimes.date, screening.showtimes.room, screening.showtimes.showtimes), screening.promoDescription, screening.retailPrice, screening.promoPrice));
     });
 }
 //#endregion
