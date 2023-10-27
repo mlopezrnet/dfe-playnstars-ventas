@@ -2,9 +2,7 @@ import { franchisesMap, moviesMap, screeningsMap, getScreenings, formatCurrency 
 
 //#region DATOS GLOBALES
 
-// Delay para simular carga desde servidor
-let delay = 2000;
-
+// Filtrado del lado del cliente
 let filteredScreenings = [];
 
 //#endregion
@@ -16,52 +14,49 @@ let filteredScreenings = [];
 function displayScreenings() {
     clearTable();
 
-    showLoadingMessage();
+    const tabla = document.getElementById('salas-table');
+    const tablaBody = tabla.querySelector('tbody');
+    const headerRow = tabla.querySelector('thead tr');
+    // const numColumns = headerRow.children.length;  // Se obtiene el número de columnas dinámicamente
 
-    setTimeout(() => {
-        const tabla = document.getElementById('salas-table');
-        const tablaBody = tabla.querySelector('tbody');
-        const headerRow = tabla.querySelector('thead tr');
-        // const numColumns = headerRow.children.length;  // Se obtiene el número de columnas dinámicamente
+    const imgPath = `../img/cartelera/`;
 
-        const imgPath = `../img/cartelera/`;
+    applyFilters();
 
-        applyFilters();
+    if (filteredScreenings.length === 0) {
+        showNotFoundMessage();
+    } else {
+        hideMessage();
 
-        if (filteredScreenings.length === 0) {
-            showNotFoundMessage();
-        } else {
-            hideMessage();
+        // Iteramos por funciones y tomamos nota de su sucursal
+        let currentFranchise = null;
 
-            // Iteramos por funciones y tomamos nota de su sucursal
-            let currentFranchise = null;
+        filteredScreenings.forEach((screening) => {
 
-            filteredScreenings.forEach((screening) => {
+            const franchise = franchisesMap.get(screening.franchiseId);
+            const movie = moviesMap.get(screening.movieId);
 
-                const franchise = franchisesMap.get(screening.franchiseId);
-                const movie = moviesMap.get(screening.movieId);
+            if (currentFranchise !== franchise) {
 
-                if (currentFranchise !== franchise) {
-
-                    // Agrupamos las funciones por sucursal
-                    const franchiseCell = document.createElement('td');
-                    franchiseCell.innerHTML = `
+                // Agrupamos las funciones por sucursal
+                const franchiseCell = document.createElement('td');
+                franchiseCell.innerHTML = `
                         <h3>${franchise.name}</h3>
                         <small>${franchise.address}</small>
                     `;
-                    const franchiseRow = document.createElement('tr');
-                    franchiseRow.className = 'franchise-leading-row';
-                    //franchiseCell.colSpan = numColumns;
-                    franchiseCell.colSpan = 10;  // Número fijo para que abarque todo el ancho de la tabla
-                    franchiseRow.appendChild(franchiseCell);
-                    tablaBody.appendChild(franchiseRow);
+                const franchiseRow = document.createElement('tr');
+                franchiseRow.className = 'franchise-leading-row';
+                //franchiseCell.colSpan = numColumns;
+                franchiseCell.colSpan = 10;  // Número fijo para que abarque todo el ancho de la tabla
+                franchiseRow.appendChild(franchiseCell);
+                tablaBody.appendChild(franchiseRow);
 
-                    currentFranchise = franchise;
-                }
+                currentFranchise = franchise;
+            }
 
-                // Creamos las filas con la información de cada película
-                const row = document.createElement('tr');
-                let commonHTML = `
+            // Creamos las filas con la información de cada película
+            const row = document.createElement('tr');
+            let commonHTML = `
                     <td><img src="${imgPath + movie.img}" alt="${movie.name}" width="100"></td>
                     <td>
                     <h3>${movie.name}</h3>
@@ -77,26 +72,26 @@ function displayScreenings() {
                     <td>${screening.promoDescription}</td>
                 `;
 
-                // Mostrar precio de promocion si es menor al precio normal
-                if (screening.promoPrice && screening.promoPrice < screening.retailPrice) {
-                    commonHTML += `
+            // Mostrar precio de promocion si es menor al precio normal
+            if (screening.promoPrice && screening.promoPrice < screening.retailPrice) {
+                commonHTML += `
                     <td>
                         <del style="color: gray;">${formatCurrency(screening.retailPrice)}</del><br>
                         <span style="color: #ec008c;">${formatCurrency(screening.promoPrice)}</span>
                     </td>
                 `;
-                } else {
-                    // Mostrar precio normal
-                    commonHTML += `
+            } else {
+                // Mostrar precio normal
+                commonHTML += `
                     <td>${formatCurrency(screening.retailPrice)}</td>
                 `;
-                }
-                row.innerHTML = commonHTML;
+            }
+            row.innerHTML = commonHTML;
 
-                tablaBody.appendChild(row);
-            });
-        }
-    }, delay);
+            tablaBody.appendChild(row);
+        });
+    }
+
 }
 
 //#endregion
@@ -148,13 +143,11 @@ function initButtonsHandler() {
 
     document.getElementById('filter-form').addEventListener('submit', event => {
         event.preventDefault();
-        delay = 0;
         displayScreenings();
     });
 
     document.getElementById('reset-filters').addEventListener('click', () => {
         document.querySelectorAll('input.filter-field').forEach(input => input.value = '');
-        delay = 2000;
         displayScreenings();
     });
 
@@ -200,6 +193,7 @@ function filterScreenings(text, ageRating, genre, promo, maxPrice, franchise) {
 
 //#region CONTROLADOR
 
+showLoadingMessage();
 getScreenings().then(() => {
     initForms();
     displayScreenings();

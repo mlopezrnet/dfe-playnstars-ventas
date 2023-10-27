@@ -1,4 +1,4 @@
-import { fetchAPI } from './fetch-api.js';
+import { fetchAPI, apiURL } from './fetch-api.js';
 import { franchisesMap, moviesMap, screeningsMap, getScreenings, formatCurrency } from './common.js';
 
 class Sale {
@@ -23,10 +23,12 @@ let editingSaleId = null;
 //#endregion
 
 // Función para obtener los boletos vendidos
-function getSales() {
+function getSales(franchiseId, movieId, date) {
     showLoadingMessage();
 
-    return fetchAPI('sales', 'GET')
+    const url = buildGetSalesDataUrl(franchiseId, movieId, date);
+
+    return fetchAPI(url, 'GET')
         .then(data => {
             console.log('Ventas existentes:', data);
             mapAPIToSales(data);
@@ -214,6 +216,26 @@ function deleteSale(saleId) {
 }
 
 //#region VISTA DE FORMULARIOS
+
+// Funcion que genera la url para consultar ventas con filtros.
+function buildGetSalesDataUrl(franchiseId, movieId, date) {
+    const url = new URL(`${apiURL}/sales`);
+
+    if (franchiseId) url.searchParams.append('franchiseId', franchiseId);
+    if (movieId) url.searchParams.append('movieId', movieId);
+    if (date) url.searchParams.append('date', date);
+
+    return url;
+}
+
+function searchSales() {
+    const franchiseFilter = document.getElementById('franchise-filter').value;
+    const movieFilter = document.getElementById('movie-filter').value;
+    const dateFilter = document.getElementById('date-filter').value;
+
+    return getSales(franchiseFilter, movieFilter, dateFilter);
+}
+
 function initFilterForm() {
     const franchiseFilter = document.getElementById('franchise-filter');
     const movieFilter = document.getElementById('movie-filter');
@@ -230,6 +252,8 @@ function initFilterForm() {
         option.text = movie.name;
         movieFilter.appendChild(option);
     });
+
+
 }
 
 
@@ -364,12 +388,13 @@ function initButtonsHandler() {
 
     document.getElementById('filter-form').addEventListener('submit', event => {
         event.preventDefault();
-        //displayScreenings();
+        searchSales().then(() => {
+            displaySalesTable();
+        });
     });
 
-    document.getElementById('reset-filters').addEventListener('click', () => {
+    document.getElementById('filter-form').addEventListener('reset', event => {
         document.querySelectorAll('input.filter-field').forEach(input => input.value = '');
-        //displayScreenings();
     });
 
     document.getElementById('sale-form').addEventListener('submit', event => {

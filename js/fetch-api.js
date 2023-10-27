@@ -1,7 +1,23 @@
-export function fetchAPI(endpoint, method = 'GET', data = null) {
+export const apiURL = 'https://65388545a543859d1bb185eb.mockapi.io/api';
 
-  const apiURL = 'https://65388545a543859d1bb185eb.mockapi.io/api/';
-  const url = apiURL + endpoint;
+export const isValidUrl = urlString => {
+  try {
+    return Boolean(new URL(urlString));
+  }
+  catch (e) {
+    return false;
+  }
+}
+
+export function fetchAPI(endpointOrUrl, method = 'GET', data = null) {
+
+  let url = '';
+
+  if (isValidUrl(endpointOrUrl)) {
+    url = endpointOrUrl;
+  } else {
+    url = `${apiURL}/${endpointOrUrl}`;
+  }
 
   const headers = {
     'Content-Type': 'application/json',
