@@ -377,7 +377,7 @@ function setupModalFormForEdit(saleId) {
     document.getElementById('sale-tickets-field').value = sale.seats.split(' ').length;
     document.getElementById('showtime-seats').value = sale.seats;
     document.getElementById('sale-promo-field').value = sale.promoDescription;
-    document.getElementById('sale-total-field').value = sale.total;
+    document.getElementById('sale-total-field').value = formatCurrency(sale.total);
 }
 
 // Funcion que inicializa los eventos de los botones
